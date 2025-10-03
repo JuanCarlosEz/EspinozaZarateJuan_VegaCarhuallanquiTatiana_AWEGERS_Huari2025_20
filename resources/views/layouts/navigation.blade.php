@@ -4,16 +4,20 @@
             <!-- Logo -->
             <div class="flex items-center">
                 <a href="{{ url('/') }}" class="flex items-center space-x-2">
-                    <img src="https://via.placeholder.com/40" alt="Logo" class="h-8 w-8">
-                    <span class="text-lg font-bold text-gray-800">Mi Proyecto</span>
+                    <span class="text-lg font-bold text-gray-800">Gestion de residuos</span>
                 </a>
             </div>
 
-            <!-- Links -->
+            <!-- Links desktop -->
             <div class="hidden sm:flex sm:space-x-6 sm:items-center">
                 <a href="{{ url('/') }}" class="text-gray-700 hover:text-green-600 font-medium">Inicio</a>
-                <a href="{{ url('/usuarios') }}" class="text-gray-700 hover:text-green-600 font-medium">Usuarios</a>
-                <a href="{{ url('/contacto') }}" class="text-gray-700 hover:text-green-600 font-medium">Contacto</a>
+                <a href="{{ url('/vehiculos/mapa') }}" class="text-gray-700 hover:text-green-600 font-medium">Mapa de Vehículos</a>
+
+                @auth
+                    @if(Auth::user()->role === 'administrador')
+                        <a href="{{ url('/admin/roles') }}" class="text-gray-700 hover:text-green-600 font-medium">Roles</a>
+                    @endif
+                @endauth
             </div>
 
             <!-- Usuario -->
@@ -47,10 +51,13 @@
     <!-- Menú móvil -->
     <div id="mobile-menu" class="hidden sm:hidden px-4 pb-4 space-y-2">
         <a href="{{ url('/') }}" class="block text-gray-700 hover:text-green-600">Inicio</a>
-        <a href="{{ url('/usuarios') }}" class="block text-gray-700 hover:text-green-600">Usuarios</a>
-        <a href="{{ url('/contacto') }}" class="block text-gray-700 hover:text-green-600">Contacto</a>
+        <a href="{{ url('/vehiculos/mapa') }}" class="block text-gray-700 hover:text-green-600">Mapa de Vehículos</a>
 
         @auth
+            @if(Auth::user()->role === 'admin')
+                <a href="{{ url('/admin/roles') }}" class="block text-gray-700 hover:text-green-600">Roles</a>
+            @endif
+
             <span class="block text-gray-600">{{ Auth::user()->name ?? Auth::user()->email }}</span>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
