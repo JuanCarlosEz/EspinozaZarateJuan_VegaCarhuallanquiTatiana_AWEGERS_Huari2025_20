@@ -2,16 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Auth\MustVerifyEmail as MustVerifyEmailTrait;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Permission\Traits\HasRoles;
-use Illuminate\Support\Facades\Auth;
 
-
-class User extends Authenticatable 
+class User extends Authenticatable
 {
     use HasFactory, Notifiable, HasRoles;
 
@@ -23,14 +19,22 @@ class User extends Authenticatable
         'telefono',
         'email',
         'password',
+        'role', // asegúrate de tener este campo en $fillable
     ];
 
     protected $hidden = ['password', 'remember_token'];
 
     protected $casts = ['email_verified_at' => 'datetime'];
 
-    public function vehicles()
+    /**
+     * Sincroniza automáticamente el campo "role" con Spatie.
+     */
+    protected static function booted()
     {
-        return $this->hasMany(Vehicle::class, 'driver_id');
+        static::retrieved(function ($user) {
+            if ($user->role && !$user->hasRole($user->role)) {
+                $user->syncRoles([$user->role]);
+            }
+        });
     }
 }

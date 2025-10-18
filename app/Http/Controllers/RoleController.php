@@ -4,14 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
-use Spatie\Permission\Models\Permission;
 use App\Models\User;
 
 class RoleController extends Controller
 {
     public function __construct()
     {
-        // Requiere estar autenticado; la comprobación de "admin" se hace dentro.
+        // Solo usuarios autenticados pueden entrar
         $this->middleware('auth');
     }
 
@@ -22,10 +21,10 @@ class RoleController extends Controller
     {
         $this->authorizeAdmin();
 
-        // Obtener usuarios (puedes paginar si hay muchos)
+        // Cargar usuarios con sus roles Spatie
         $usuarios = User::with('roles')->get();
 
-        // Obtener lista de roles disponibles (desde Spatie si está instalado)
+        // Obtener roles desde Spatie (solo los válidos para asignar)
         $roles = Role::pluck('name')->toArray();
 
         return view('admin.roles.index', compact('usuarios', 'roles'));
@@ -38,24 +37,38 @@ class RoleController extends Controller
     {
         $this->authorizeAdmin();
 
-        // Obtener roles válidos (desde la tabla roles)
-        $validRoles = Role::pluck('name')->toArray();
-
-        $request->validate([
-            'role' => ['required', 'in:' . implode(',', $validRoles)],
-        ]);
-
         $usuario = User::findOrFail($id);
-        $newRole = $request->role;
 
-        // Si el modelo usa HasRoles (Spatie), sincronizamos roles
-        if (method_exists($usuario, 'syncRoles')) {
-            $usuario->syncRoles([$newRole]);
+        // Determinar su rol actual (Spatie o campo local)
+        $rolActual = method_exists($usuario, 'getRoleNames')
+            ? $usuario->getRoleNames()->first()
+            : ($usuario->role ?? null);
+
+        $rolActualNormalizado = strtolower(trim($rolActual ?? ''));
+
+        // ⚠️ No permitir modificar a un administrador
+        if ($rolActualNormalizado === 'administrador') {
+            return back()->with('error', 'No puedes modificar el rol de un administrador.');
         }
 
-        // Además actualizamos un campo role simple (por compatibilidad)
-        if (isset($usuario->role)) {
-            $usuario->role = $newRole;
+        // Validar el nuevo rol
+        $nuevoRol = strtolower(trim($request->role));
+
+        // Solo se pueden asignar estos dos roles
+        $rolesPermitidos = ['ciudadano', 'conductor'];
+
+        if (!in_array($nuevoRol, $rolesPermitidos)) {
+            return back()->with('error', 'Rol no permitido.');
+        }
+
+        // 🔄 Actualizar rol Spatie (si aplica)
+        if (method_exists($usuario, 'syncRoles')) {
+            $usuario->syncRoles([$nuevoRol]);
+        }
+
+        // 🔄 Actualizar campo role en la BD (si existe)
+        if (in_array('role', $usuario->getFillable())) {
+            $usuario->role = $nuevoRol;
             $usuario->save();
         }
 
@@ -63,26 +76,23 @@ class RoleController extends Controller
     }
 
     /**
-     * Método helper para autorizar solo administradores.
-     * Comprueba Spatie (hasRole) o el campo role.
+     * Verificar que el usuario actual sea administrador.
      */
     protected function authorizeAdmin()
     {
         $user = auth()->user();
 
-        if (! $user) {
+        if (!$user) {
             abort(403, 'No autenticado.');
         }
 
-        // Si el usuario tiene método hasRole (Spatie), usarlo
-        if (method_exists($user, 'hasRole')) {
-            if ($user->hasRole('administrador')) {
-                return true;
-            }
+        // Verificar rol con Spatie
+        if (method_exists($user, 'hasRole') && $user->hasRole('administrador')) {
+            return true;
         }
 
-        // Si existe campo role lo verificamos
-        if (isset($user->role) && $user->role === 'administrador') {
+        // Verificar campo role directamente
+        if (isset($user->role) && strtolower(trim($user->role)) === 'administrador') {
             return true;
         }
 

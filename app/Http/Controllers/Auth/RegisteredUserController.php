@@ -50,6 +50,8 @@ class RegisteredUserController extends Controller
 
         Auth::login($user);
 
-        return redirect()->route('dashboard');
+        return redirect()->route('dashboard')
+        ->with('registro_exitoso', 'Registro exitoso, hola ' . $user->nombres);
+
     }
 }

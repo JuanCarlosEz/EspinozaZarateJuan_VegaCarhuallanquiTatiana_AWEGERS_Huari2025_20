@@ -8,6 +8,14 @@
 
 @section('content')
 <div class="max-w-md mx-auto bg-white shadow rounded-lg p-6 mt-8">
+
+    {{-- Mensaje de registro exitoso --}}
+    @if(session('registro_exitoso'))
+        <div class="mb-6 p-4 bg-green-100 text-green-700 border border-green-300 rounded-lg text-center">
+            {{ session('registro_exitoso') }}
+        </div>
+    @endif
+
     <h1 class="text-2xl font-bold mb-6 text-center">Crear nueva cuenta</h1>
 
     <form method="POST" action="{{ route('register') }}">
