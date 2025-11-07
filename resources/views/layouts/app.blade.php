@@ -1,25 +1,31 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
-    <head>
-        <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <meta name="csrf-token" content="{{ csrf_token() }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
 
-        <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'Laravel') }}</title>
 
-        <!-- Tailwind CSS via CDN -->
-        <script src="https://cdn.tailwindcss.com"></script>
-    </head>
-    <body class="font-sans antialiased bg-gray-100 min-h-screen">
-        
-        @include('layouts.navigation')
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
 
-        <!-- Page Heading -->
-        @yield('header')
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 
-        <!-- Page Content -->
-        <main class="p-6">
-            @yield('content')
-        </main>
-    </body>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+</head>
+<body class="font-sans antialiased bg-gray-100 min-h-screen">
+    
+    @include('layouts.navigation')
+
+    <!-- Page Heading -->
+    @yield('header')
+
+    <!-- Page Content -->
+    <main class="p-6">
+        @yield('content')
+    </main>
+</body>
 </html>

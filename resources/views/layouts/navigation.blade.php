@@ -4,7 +4,7 @@
             <!-- Logo -->
             <div class="flex items-center">
                 <a href="{{ url('/') }}" class="flex items-center space-x-2">
-                    <span class="text-lg font-bold text-gray-800">Gestion de residuos</span>
+                    <span class="text-lg font-bold text-gray-800">Gestión de Residuos</span>
                 </a>
             </div>
 
@@ -14,8 +14,24 @@
                 <a href="{{ url('/vehiculos/mapa') }}" class="text-gray-700 hover:text-green-600 font-medium">Mapa de Vehículos</a>
 
                 @auth
+                    {{-- 🔹 Enlaces para ADMINISTRADOR --}}
                     @if(Auth::user()->role === 'administrador')
                         <a href="{{ url('/admin/roles') }}" class="text-gray-700 hover:text-green-600 font-medium">Roles</a>
+                        <a href="{{ url('/zonas') }}" class="text-gray-700 hover:text-green-600 font-medium">Zonas</a>
+                        <a href="{{ url('/mantenimientos') }}" class="text-gray-700 hover:text-green-600 font-medium">Mantenimientos</a>
+                        <a href="{{ url('/planificaciones') }}" class="text-gray-700 hover:text-green-600 font-medium">Planificaciones</a>
+                        <a href="{{ url('/reportes') }}" class="text-gray-700 hover:text-green-600 font-medium">Reportes</a> {{-- ✅ agregado --}}
+                    @endif
+
+                    {{-- 🔹 Enlaces para CIUDADANO --}}
+                    @if(Auth::user()->role === 'ciudadano')
+                        <a href="{{ url('/reportes') }}" class="text-gray-700 hover:text-green-600 font-medium">Mis Reportes</a>
+                    @endif
+
+                    {{-- 🔹 Enlaces para CONDUCTOR --}}
+                    @if(Auth::user()->role === 'conductor')
+                        <a href="{{ url('/mantenimientos') }}" class="text-gray-700 hover:text-green-600 font-medium">Mantenimientos</a>
+                        <a href="{{ url('/planificaciones') }}" class="text-gray-700 hover:text-green-600 font-medium">Rutas Asignadas</a>
                     @endif
                 @endauth
             </div>
@@ -23,7 +39,7 @@
             <!-- Usuario -->
             <div class="hidden sm:flex sm:items-center space-x-4">
                 @auth
-                    <span class="text-gray-600">{{ Auth::user()->name ?? Auth::user()->email }}</span>
+                    <span class="text-gray-600">{{ Auth::user()->nombres ?? Auth::user()->email }}</span>
                     <form method="POST" action="{{ route('logout') }}">
                         @csrf
                         <button type="submit" class="text-sm text-red-600 hover:text-red-800 font-medium">
@@ -54,11 +70,27 @@
         <a href="{{ url('/vehiculos/mapa') }}" class="block text-gray-700 hover:text-green-600">Mapa de Vehículos</a>
 
         @auth
-            @if(Auth::user()->role === 'admin')
+            {{-- 🔹 Enlaces para ADMINISTRADOR --}}
+            @if(Auth::user()->role === 'administrador')
                 <a href="{{ url('/admin/roles') }}" class="block text-gray-700 hover:text-green-600">Roles</a>
+                <a href="{{ url('/zonas') }}" class="block text-gray-700 hover:text-green-600">Zonas</a>
+                <a href="{{ url('/mantenimientos') }}" class="block text-gray-700 hover:text-green-600">Mantenimientos</a>
+                <a href="{{ url('/planificaciones') }}" class="block text-gray-700 hover:text-green-600">Planificaciones</a>
+                <a href="{{ url('/reportes') }}" class="block text-gray-700 hover:text-green-600">Reportes</a> {{-- ✅ agregado --}}
             @endif
 
-            <span class="block text-gray-600">{{ Auth::user()->name ?? Auth::user()->email }}</span>
+            {{-- 🔹 Enlaces para CIUDADANO --}}
+            @if(Auth::user()->role === 'ciudadano')
+                <a href="{{ url('/reportes') }}" class="block text-gray-700 hover:text-green-600">Mis Reportes</a>
+            @endif
+
+            {{-- 🔹 Enlaces para CONDUCTOR --}}
+            @if(Auth::user()->role === 'conductor')
+                <a href="{{ url('/mantenimientos') }}" class="block text-gray-700 hover:text-green-600">Mantenimientos</a>
+                <a href="{{ url('/planificaciones') }}" class="block text-gray-700 hover:text-green-600">Rutas Asignadas</a>
+            @endif
+
+            <span class="block text-gray-600">{{ Auth::user()->nombres ?? Auth::user()->email }}</span>
             <form method="POST" action="{{ route('logout') }}">
                 @csrf
                 <button type="submit" class="block w-full text-left text-red-600 hover:text-red-800">
