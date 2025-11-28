@@ -38,6 +38,7 @@ Route::get('/mapa', function () {
 // Mapa de vehículos
 Route::get('/vehiculos/mapa', [VehiculoController::class, 'mapa'])->name('vehiculos.mapa');
 
+
 // 🔒 Agrupar rutas del sistema principal (solo usuarios autenticados)
 Route::middleware(['auth'])->group(function () {
 
@@ -54,5 +55,11 @@ Route::middleware(['auth'])->group(function () {
     // Gestión de zonas
     Route::resource('zonas', ZonaController::class);
 });
+
+
+Route::get('/rutas', function () {
+        return view('rutas');
+    })->name('rutas');
+
 
 require __DIR__.'/auth.php';
